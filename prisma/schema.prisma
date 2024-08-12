@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Permission {
+  id                 String              @id
+  permission         String
+  profilePermissions ProfilePermission[]
+
+  @@map("permission")
+}
+
+model Profile {
+  id                 String              @id
+  ProfileName        String
+  profilePermissions ProfilePermission[]
+ 
+
+  @@map("profile")
+}
+
+model ProfilePermission {
+  profileId    String
+  permissionId String
+
+  profile    Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, permissionId])
+  @@map("profile_permission")
+}
+
+model User {
+  id          String        @id
+  name        String
+  email       String        @unique
+  
+
+  @@map("user")
+}
+
+model UserProfile {
+  profileId String
+  userId    String
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PhoneNumber {
+  id     String @id
+  number String
+
+  @@map("phone_number")
+}
