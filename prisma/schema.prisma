@@ -16,6 +16,8 @@ datasource db {
 model Permission {
   id                 String              @id
   permission         String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   profilePermissions ProfilePermission[]
 
   @@map("permission")
@@ -25,7 +27,7 @@ model Profile {
   id                 String              @id
   ProfileName        String
   profilePermissions ProfilePermission[]
- 
+  userProfile        UserProfile[]
 
   @@map("profile")
 }
@@ -42,25 +44,55 @@ model ProfilePermission {
 }
 
 model User {
-  id          String        @id
-  name        String
-  email       String        @unique
-  
+  id              String            @id
+  name            String
+  email           String            @unique
+  password        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userProfile     UserProfile[]
+  userPhoneNumber UserPhoneNumber[]
 
   @@map("user")
 }
 
 model UserProfile {
-  profileId String
   userId    String
+  profileId String
 
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([userId, profileId])
+  @@map("user_profile")
 }
 
 model PhoneNumber {
-  id     String @id
-  number String
+  id              String            @id
+  number          String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userPhoneNumber UserPhoneNumber[]
 
   @@map("phone_number")
+}
+
+model UserPhoneNumber {
+  userId        String
+  phoneNumberId String
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  @@id([userId, phoneNumberId])
+  @@map("user_phone_number")
+}
+
+model Schedule {
+  id  String  @id
+  data  String
+  statut  String
+  
+  
+
 }
