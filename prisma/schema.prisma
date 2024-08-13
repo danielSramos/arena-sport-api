@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Permission {
+  id                 String              @id
+  permission         String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  profilePermissions ProfilePermission[]
+
+  @@map("permission")
+}
+
+model Profile {
+  id                 String              @id
+  ProfileName        String
+  profilePermissions ProfilePermission[]
+  userProfile        UserProfile[]
+
+  @@map("profile")
+}
+
+model ProfilePermission {
+  profileId    String
+  permissionId String
+
+  profile    Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, permissionId])
+  @@map("profile_permission")
+}
+
+model User {
+  id              String            @id
+  name            String
+  email           String            @unique
+  password        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userProfile     UserProfile[]
+  userPhoneNumber UserPhoneNumber[]
+
+  @@map("user")
+}
+
+model UserProfile {
+  id        String @unique
+  userId    String
+  profileId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([userId, profileId])
+  @@map("user_profile")
+}
+
+model PhoneNumber {
+  id              String            @id
+  number          String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userPhoneNumber UserPhoneNumber[]
+
+  @@map("phone_number")
+}
+
+model UserPhoneNumber {
+  id            String @unique
+  userId        String
+  phoneNumberId String
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+
+  @@id([userId, phoneNumberId])
+  @@map("user_phone_number")
+}
+
+model Event {
+  id          String        @id
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  eventStatus EventStatus[]
+
+  @@map("event")
+}
+
+model Status {
+  id          String        @id
+  status      String
+  nameEvent   String
+  eventStatus EventStatus[]
+
+  @@map("status")
+}
+
+model EventStatus {
+  id       String @unique
+  eventId  String
+  statusId String
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status Status @relation(fields: [statusId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, statusId])
+  @@map("event_status")
+}
+
+model Courts {
+  id  String  @id
+  type  String
+  name  String
+  scheduleId  String
+  courtsSchedule CourtsSchedule[]
+  
+  schedule  Schedule  @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@map("courts")
+}
+
+model Schedule {
+  id   String @id
+  data String
+  statusId  String
+  courts  Courts[]
+  courtsSchedule CourtsSchedule[]
+
+  @@map("schedule")
+}
+
+model CourtsSchedule {
+  id String @unique
+  courtsId  String
+  scheduleId  String
+
+  courts  Courts @relation(fields: [courtsId], references: [id], onDelete: Cascade)
+  schedule  Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@id([courtsId, scheduleId])
+  @@map("courts_schedule")
+}
