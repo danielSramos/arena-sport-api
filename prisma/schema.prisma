@@ -57,6 +57,7 @@ model User {
 }
 
 model UserProfile {
+  id        String @unique
   userId    String
   profileId String
 
@@ -78,6 +79,7 @@ model PhoneNumber {
 }
 
 model UserPhoneNumber {
+  id            String @unique
   userId        String
   phoneNumberId String
 
@@ -88,11 +90,67 @@ model UserPhoneNumber {
   @@map("user_phone_number")
 }
 
-model Schedule {
-  id  String  @id
-  data  String
-  statut  String
-  
-  
+model Event {
+  id          String        @id
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  eventStatus EventStatus[]
 
+  @@map("event")
+}
+
+model Status {
+  id          String        @id
+  status      String
+  nameEvent   String
+  eventStatus EventStatus[]
+
+  @@map("status")
+}
+
+model EventStatus {
+  id       String @unique
+  eventId  String
+  statusId String
+
+  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status Status @relation(fields: [statusId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, statusId])
+  @@map("event_status")
+}
+
+model Courts {
+  id  String  @id
+  type  String
+  name  String
+  scheduleId  String
+  courtsSchedule CourtsSchedule[]
+  
+  schedule  Schedule  @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@map("courts")
+}
+
+model Schedule {
+  id   String @id
+  data String
+  statusId  String
+  courts  Courts[]
+  courtsSchedule CourtsSchedule[]
+
+  @@map("schedule")
+}
+
+model CourtsSchedule {
+  id String @unique
+  courtsId  String
+  scheduleId  String
+
+  courts  Courts @relation(fields: [courtsId], references: [id], onDelete: Cascade)
+  schedule  Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@id([courtsId, scheduleId])
+  @@map("courts_schedule")
 }
