@@ -13,91 +13,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Permission {
-  id                 String              @id
+model Permissions {
+  id                 String               @id
   permission         String
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  profilePermissions ProfilePermission[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  profilePermissions ProfilePermissions[]
 
-  @@map("permission")
+  @@map("permissions")
 }
 
-model Profile {
-  id                 String              @id
+model Profiles {
+  id                 String               @id
   ProfileName        String
-  profilePermissions ProfilePermission[]
-  userProfile        UserProfile[]
+  profilePermissions ProfilePermissions[]
+  userProfiles       UserProfiles[]
 
-  @@map("profile")
+  @@map("profiles")
 }
 
-model ProfilePermission {
+model ProfilePermissions {
   profileId    String
   permissionId String
 
-  profile    Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  profiles    Profiles    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  permissions Permissions @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([profileId, permissionId])
-  @@map("profile_permission")
+  @@map("profile_permissions")
 }
 
-model User {
-  id              String            @id
-  name            String
-  email           String            @unique
-  password        String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  userProfile     UserProfile[]
-  userPhoneNumber UserPhoneNumber[]
+model Users {
+  id               String             @id
+  name             String
+  email            String             @unique
+  password         String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  userProfiles     UserProfiles[]
+  userPhoneNumbers UserPhoneNumbers[]
 
-  @@map("user")
+  @@map("users")
 }
 
-model UserProfile {
+model UserProfiles {
   id        String @unique
   userId    String
   profileId String
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  users    Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profiles Profiles @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([userId, profileId])
-  @@map("user_profile")
+  @@map("user_profiles")
 }
 
-model PhoneNumber {
-  id              String            @id
-  number          String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  userPhoneNumber UserPhoneNumber[]
+model PhoneNumbers {
+  id               String             @id
+  number           String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  userPhoneNumbers UserPhoneNumbers[]
 
-  @@map("phone_number")
+  @@map("phone_numbers")
 }
 
-model UserPhoneNumber {
+model UserPhoneNumbers {
   id            String @unique
   userId        String
   phoneNumberId String
 
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  phoneNumber PhoneNumber @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
+  users        Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phoneNumbers PhoneNumbers @relation(fields: [phoneNumberId], references: [id], onDelete: Cascade)
 
   @@id([userId, phoneNumberId])
-  @@map("user_phone_number")
+  @@map("user_phone_numbers")
 }
 
-model Event {
+model Events {
   id          String        @id
   name        String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   eventStatus EventStatus[]
 
-  @@map("event")
+  @@map("events")
 }
 
 model Status {
@@ -114,7 +114,7 @@ model EventStatus {
   eventId  String
   statusId String
 
-  event  Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event  Events @relation(fields: [eventId], references: [id], onDelete: Cascade)
   status Status @relation(fields: [statusId], references: [id], onDelete: Cascade)
 
   @@id([eventId, statusId])
@@ -122,35 +122,35 @@ model EventStatus {
 }
 
 model Courts {
-  id  String  @id
-  type  String
-  name  String
-  scheduleId  String
-  courtsSchedule CourtsSchedule[]
-  
-  schedule  Schedule  @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  id              String            @id
+  type            String
+  name            String
+  scheduleId      String
+  courtsSchedules CourtsSchedules[]
+
+  schedules Schedules @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
   @@map("courts")
 }
 
-model Schedule {
-  id   String @id
-  data String
-  statusId  String
-  courts  Courts[]
-  courtsSchedule CourtsSchedule[]
+model Schedules {
+  id              String            @id
+  data            String
+  statusId        String
+  courts          Courts[]
+  courtsSchedules CourtsSchedules[]
 
-  @@map("schedule")
+  @@map("schedules")
 }
 
-model CourtsSchedule {
-  id String @unique
-  courtsId  String
-  scheduleId  String
+model CourtsSchedules {
+  id         String @unique
+  courtsId   String
+  scheduleId String
 
-  courts  Courts @relation(fields: [courtsId], references: [id], onDelete: Cascade)
-  schedule  Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  courts    Courts    @relation(fields: [courtsId], references: [id], onDelete: Cascade)
+  schedules Schedules @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
   @@id([courtsId, scheduleId])
-  @@map("courts_schedule")
+  @@map("courts_schedules")
 }
